@@ -2,57 +2,81 @@ import os
 from collections import defaultdict
 import pandas as pd
 
-def listar_arquivos(caminho_pasta):
-    # Lista todos os arquivos no diretório
-    return [arquivo for arquivo in os.listdir(caminho_pasta) if os.path.isfile(os.path.join(caminho_pasta, arquivo))]
+DIRECTORY = r'C:\Digitalizacao_Cortesias\Processadas'
+SPREADSHEET_PATH = r'C:\Digitalizacao_Cortesias\cortesias_enviadas.xlsx'
+DATABASE_SPREADSHEET = 'database.xlsx'
+SCHOOLS_DB = {}
 
-def processar_arquivos(arquivos):
-    # Estrutura de dados para armazenar as informações
-    dados_escolas = defaultdict(lambda: {"ano": 2025, "paginas_solicitadas": set()})
+excel_file = pd.ExcelFile(DATABASE_SPREADSHEET)
+for sheet_name in excel_file.sheet_names:
+    df = excel_file.parse(sheet_name, dtype={"school_code": int})
+    schools_database = df.to_json(orient='records')
+    with open(f'{sheet_name}.json', 'w', encoding='utf-8') as f:
+        f.write(schools_database)
+        print(f'Arquivo {sheet_name}.json gerado com sucesso!')
 
-    for arquivo in arquivos:
-        # Remove a extensão .JPG e divide o nome do arquivo
-        nome_sem_extensao = arquivo.split('.')[0]
-        partes = nome_sem_extensao.split('_')
+def list_file(directory_path):
+    file_list = []
+    for file in os.listdir(directory_path):
+        if os.path.isfile(os.path.join(directory_path, file)):
+            file_list.append(file)
+    return file_list
 
-        if len(partes) == 3:  # Garante que o nome do arquivo está no formato esperado
-            codigo_escola, ano, pagina = partes
+def process_files(file_list, school_database):
+    school_data = defaultdict(
+        lambda:
+        {
+            "year": 2025,
+            "pages": set(),
+            "school_name": None,
+            "promoter": None
+        })
 
-            # Filtra apenas o ano de 2025
-            if ano == "2025":
-                # Adiciona a página ao conjunto de páginas da escola
-                dados_escolas[codigo_escola]["paginas_solicitadas"].add(pagina)
+    for file in file_list:
+        file_parts = file.split('.')[0].split('_')
 
-    # Converte o conjunto de páginas para a quantidade de páginas
-    for codigo_escola, info in dados_escolas.items():
-        info["paginas_solicitadas"] = len(info["paginas_solicitadas"])
+        if len(file_parts) == 3:
+            school_code, year, page = file_parts
+            try:
+                school_code = int(school_code)
+            except ValueError:
+                print(f'Código da escola inválido (não é um número): {school_code}')
+                continue
 
-    return dados_escolas
+            if school_code in school_database:
+                school_data[school_code]["school_name"] = school_database[school_code]["school_name"]
+                school_data[school_code]["promoter"] = school_database[school_code]["promoter"]
+            else:
+                print(f'Código da escola não encontrado no banco de dados: {school_code}')
+                continue
 
-def salvar_em_excel(dados_escolas, caminho_saida):
-    # Converte o dicionário em um DataFrame do pandas
-    dados = []
-    for codigo_escola, info in dados_escolas.items():
-        dados.append([codigo_escola, info["ano"], info["paginas_solicitadas"]])
+            if year == '2025':
+                school_data[school_code]["pages"].add(page)
 
-    df = pd.DataFrame(dados, columns=["Código da Escola", "Ano", "Páginas Solicitadas"])
+    for school_code, info in school_data.items():
+        info['pages'] = len(info['pages'])
 
-    # Salva o DataFrame em um arquivo Excel
-    df.to_excel(caminho_saida, index=False)
+    return school_data
 
-# Caminho da pasta que você quer listar os arquivos
-caminho_pasta = r'C:\Digitalizacao_Cortesias\Processadas'
+def save_to_spreadsheet(school_data, output_path):
+    data = []
+    for school_code, info in school_data.items():
+        data.append([
+            int(school_code),
+            info['school_name'],
+            info['promoter'],
+            info['year'],
+            info['pages']
+        ])
+    df = pd.DataFrame(data, columns=["school_code", "school_name", "promoter", "year", "pages"])
+    df.to_excel(output_path, index=False)
 
-# Caminho de saída para o arquivo Excel
-caminho_saida = r'C:\Digitalizacao_Cortesias\relatorio_escolas_2025.xlsx'
+files = list_file(DIRECTORY)
+# school_db = {int(school["school_code"]): school for school in pd.read_json('db_schools.json')}
+df_schools = pd.read_json('db_schools.json')
+schools_list = df_schools.to_dict(orient='records')
+school_db = {int(school["school_code"]): school for school in schools_list}
+school_data = process_files(files, school_db)
+save_to_spreadsheet(school_data, SPREADSHEET_PATH)
 
-# Lista os arquivos
-arquivos = listar_arquivos(caminho_pasta)
-
-# Processa os arquivos e gera a estrutura de dados
-dados_escolas = processar_arquivos(arquivos)
-
-# Salva os dados em uma planilha Excel
-salvar_em_excel(dados_escolas, caminho_saida)
-
-print(f"Relatório salvo em: {caminho_saida}")
+print(f'relatório gerado em {SPREADSHEET_PATH}')
