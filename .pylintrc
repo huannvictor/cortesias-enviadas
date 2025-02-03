@@ -1,0 +1,4 @@
+[MESSAGES CONTROL]
+disable=
+    missing-docstring,  # Desabilita a verificação de docstrings ausentes
+    empty-docstring     # Desabilita a verificação de docstrings vazias
