@@ -72,7 +72,6 @@ def save_to_spreadsheet(school_data, output_path):
     df.to_excel(output_path, index=False)
 
 files = list_file(DIRECTORY)
-# school_db = {int(school["school_code"]): school for school in pd.read_json('db_schools.json')}
 df_schools = pd.read_json('db_schools.json')
 schools_list = df_schools.to_dict(orient='records')
 school_db = {int(school["school_code"]): school for school in schools_list}
