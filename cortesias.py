@@ -3,7 +3,7 @@ from collections import defaultdict
 import pandas as pd
 
 DIRECTORY = r'C:\Digitalizacao_Cortesias\Processadas'
-SPREADSHEET_PATH = r'C:\Digitalizacao_Cortesias\cortesias_enviadas.xlsx'
+SPREADSHEET_PATH = r'.\cortesias_enviadas.xlsx'
 DATABASE_SPREADSHEET = 'database.xlsx'
 SCHOOLS_DB = {}
 
