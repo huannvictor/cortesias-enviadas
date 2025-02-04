@@ -2,8 +2,8 @@ import os
 from collections import defaultdict
 import pandas as pd
 
-DIRECTORY = r'caminho da pasta onde estão os arquivos'
-SPREADSHEET_PATH = r'caminho onde deseja salvar o arquivo'
+DIRECTORY = r'./cortesias'
+SPREADSHEET_PATH = r'./relatorio.xlsx'
 DATABASE_SPREADSHEET = 'database.xlsx'
 SCHOOLS_DB = {}
 
@@ -11,9 +11,9 @@ excel_file = pd.ExcelFile(DATABASE_SPREADSHEET)
 for sheet_name in excel_file.sheet_names:
     df = excel_file.parse(sheet_name, dtype={"school_code": int})
     schools_database = df.to_json(orient='records')
-    with open(f'{sheet_name}.json', 'w', encoding='utf-8') as f:
+    with open('db_schools.json', 'w', encoding='utf-8') as f:
         f.write(schools_database)
-        print(f'Arquivo {sheet_name}.json gerado com sucesso!')
+        print('Arquivo db_schools.json gerado com sucesso!')
 
 def list_file(directory_path):
     file_list = []
