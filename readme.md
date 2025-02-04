@@ -57,11 +57,14 @@ pip install -r requirements.txt
 ```
 cortesias-enviadas/
 ├── script.py              # Script principal
-├── db_schools.json        # Banco de dados das escolas (gerado a partir do Excel)
-├── database.xlsx          # Arquivo Excel com os dados das escolas
-├── README.md              # Este arquivo
-└── requirements.txt       # Lista de dependências
+├── db_schools.json        # Banco de dados das escolas (será gerado ao rodar o script)
+├── database.xlsx          # Arquivo Excel com os dados fictícios das escolas
+├── README.md              # Documentação do projeto
+├── requirements.txt       # Lista de dependências
+└── cortesias/             # Pasta com arquivos fictícios para teste
 ```
+
+
 
 ## Exemplo de Uso
 
