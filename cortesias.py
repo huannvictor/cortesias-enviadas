@@ -2,8 +2,8 @@ import os
 from collections import defaultdict
 import pandas as pd
 
-DIRECTORY = r'C:\Digitalizacao_Cortesias\Processadas'
-SPREADSHEET_PATH = r'.\cortesias_enviadas.xlsx'
+DIRECTORY = r'caminho da pasta onde estão os arquivos'
+SPREADSHEET_PATH = r'caminho onde deseja salvar o arquivo'
 DATABASE_SPREADSHEET = 'database.xlsx'
 SCHOOLS_DB = {}
 
